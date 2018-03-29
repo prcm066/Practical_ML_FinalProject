@@ -14,19 +14,131 @@ Data was downloaded from the following url:
 https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv
 https://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv
 
+We load the libraries caret, and dplyr. The latter contains utilities for data transformation, the former, caret, contains tools to train Machine Learning models and is a wrapper over several other libraries.
 
-## Data description
+```{r, echo=FALSE, cache=TRUE}
+library("caret")
+library("dplyr")
 
-You can also embed plots, for example:
-
-
-
-```{r , cache=TRUE, echo=FALSE}
-setwd("C://Users/Pablo/Dropbox/DataScience")
-train<-read.csv("pml-training.csv")
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+# Loading and Cleaning
+
+As a first step, we load the data and split it in training and testing samples.
+
+```{r, echo=TRUE, cache=TRUE}
+
+setwd("C://Users/Pablo/Dropbox/DataScience")
+datos<-read.csv("pml-training.csv")
+
+set.seed(20180325)
+
+itrain<-createDataPartition(y=datos$classe,p=0.7, list=FALSE)
+
+training<-datos[itrain,]
+testing<-datos[-itrain,]
+
+```
+
+
+```{r,echo=TRUE, cache=TRUE}
+dim(training)
+```
+
+
+We have 160 variables, 159 without the target.A quick look at our data shows that there are many variavles win a high number of missings. We won't exclude them since we are going to use Xgboost tree classifier, which can handle NA's.
+
+We build the following function in order to find the variables that have a percentage of NA's above a given threshold. 
+
+```{r, ech=TRUE, cache=TRUE}
+
+## quitamos variables con vacios
+removeNaVars<-function(tabla,thres){
+  tabla<-training
+  nr<-nrow(tabla)
+  nc<-ncol(tabla)
+  lista<-rep(FALSE,nc)
+  for(i in c(1:nc))
+  {
+    lista[i]<-ifelse(sum(is.na(tabla[,i]))/nr>thres, TRUE,FALSE)
+  }
+  return(lista)
+}
+```
+
+The usage of this function is almost like nearZeroVar function in caret.
+```{r,echo=TRUE,cache=TRUE}
+nas<-removeNaVars(training,0.9)
+table(nas)
+tr2<-training[,!nas]
+ncol(tr2)
+```
+
+There were 67 variables with more thatn 90% of missings, we will remove them.
+
+```{r,echo=TRUE, cache=TRUE}
+nzv <- nearZeroVar(tr2, saveMetrics= TRUE)
+table(nzv$nzv)
+tr3<-tr2[,!nzv$nzv]
+```
+
+Since Tree based methods can handle near zero variance variables, we will leave them.
+
+# Model Fitting
+
+We chose to fit a boosting classifier, specifically the Xgboost tree classifier, due to its good performance out of the box and its robustness in the precence of missings, sparse variables, etc.
+
+
+## Training control and MetaParameter tuning
+
+The control will be done using repeated cross validatio, we prepare a metaparameter grids for tuning.
+
+```{r,echo=TRUE,cache=TRUE}
+
+fitControl <- trainControl(## 10-fold CV
+  method = "cv",
+  number = 10,
+  ## 10 reps
+  repeats = 5)
+#
+#xgbtree.grid<-expand.grid(nrounds = c(1, 10, 20),
+#                          max_depth = c(1, 4),
+#                          eta = c(.1, .4),
+#                          gamma = 0,
+#                          colsample_bytree = .7,
+#                          min_child_weight = 1,
+#                          subsample = c(.8, 1))
+```
+
+
+
+```{r,echo=TRUE,cache=TRUE}
+```
+
+
+## Model Fitting
+
+The training is done using Gradient Boosting Trees as implemented in xgboost ("Extreme Gradient Boosting")
+
+```{r,echo=TRUE,cache=TRUE}
+modelo <- train(classe ~ ., 
+                data = tr3 , 
+                method = "xgbTree", 
+                trControl = fitControl,
+               # tuneGrid=xgbtree.grid, 
+                verbose = FALSE,
+                na.action=na.pass)
+summary(modelo)
+```
+
+ 
+
+## Testing
+
+```{r,echo=TRUE,cache=TRUE}
+pred <- predict(modelo, testing)
+cm<-confusionMatrix(pred,testing$classe)
+```
 
 
 # References
