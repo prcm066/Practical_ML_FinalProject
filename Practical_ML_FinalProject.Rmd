@@ -167,7 +167,7 @@ The model was able to correctly classify the 20 cases and got an score of 20/20 
 
 # References
 
-Ugulino, W., Cardador, D., Vega, K., Velloso, E., Milidiú, R., & Fuks, H. (2012). Wearable computing: Accelerometers' data classification of body postures and movements. In Advances in Artificial Intelligence-SBIA 2012 (pp. 52-61). Springer, Berlin, Heidelberg.
+Ugulino, W., Cardador, D., Vega, K., Velloso, E., Milidiu, R., & Fuks, H. (2012). Wearable computing: Accelerometers' data classification of body postures and movements. In Advances in Artificial Intelligence-SBIA 2012 (pp. 52-61). Springer, Berlin, Heidelberg.
 
 Ridgeway, G., & Ridgeway, M. G. (2004). The gbm package. R Foundation for Statistical Computing, Vienna, Austria, 5(3).
 
