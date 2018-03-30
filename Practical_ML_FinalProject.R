@@ -32,14 +32,27 @@ fitControl <- trainControl(## 10-fold CV
   method = "repeatedcv",
   number = 10,
   ## 10 reps
-  repeats = 3)
+  repeats = 5)
+
+xgbtree.grid<-expand.grid(nrounds = c(1, 10, 20),
+                          max_depth = c(1, 4),
+                          eta = c(.1, .4),
+                          gamma = 0,
+                          colsample_bytree = .7,
+                          min_child_weight = 1,
+                          subsample = c(.8, 1))
 
 
+fitControl <- trainControl(## 10-fold CV
+  method = "cv",
+  number = 10)
 
-pp<-preProcess(tr3, method="knnImpute",k=10)
-pptrain<-predict(pp,tr3)
-modelo <- train(classe ~ ., data = pptrain, 
-         method = "xgbTree", 
-         trControl = fitControl,
-         verbose = FALSE)
+modelo <- train(classe ~ ., 
+                data = tr3, 
+                method = "rf", 
+                trControl = fitControl,
+                verbose = TRUE,
+                na.action=na.pass)
 
+
+  
