@@ -93,7 +93,7 @@ We chose to fit a boosting classifier, specifically the gradient boosting tree c
 
 ## Training control and MetaParameter tuning
 
-The control will be done using repeated cross validation, we prepare a metaparameter grids for tuning.
+The control will be done using cross validation. Initially we we prepare a metaparameter grids for tuning, but it was very expensive computationaly and decided not to tune using a custom grid. 
 
 ```{r,echo=TRUE,cache=TRUE}
 

@@ -194,7 +194,7 @@ table(nzv$nzv)</code></pre>
 <p>We chose to fit a boosting classifier, specifically the gradient boosting tree classifier, due to its good performance out of the box and its robustness in the precence of missings, sparse variables, etc.</p>
 <div id="training-control-and-metaparameter-tuning" class="section level2">
 <h2>Training control and MetaParameter tuning</h2>
-<p>The control will be done using repeated cross validation, we prepare a metaparameter grids for tuning.</p>
+<p>The control will be done using cross validation. Initially we we prepare a metaparameter grids for tuning, but it was very expensive computationaly and decided not to tune using a custom grid.</p>
 <pre class="r"><code>fitControl &lt;- trainControl(## 10-fold CV
   method = &quot;cv&quot;,
   number = 10)
